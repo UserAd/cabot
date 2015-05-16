@@ -80,6 +80,11 @@
 
 <hr>
 
+{% include 'cabotapp/_statuscheck_list.html' with checks=service.sip_status_checks.all service=service checks_type="Sip" %}
+
+
+<hr>
+
 <div class="row">
   <div class="col-xs-12">
     <div class="col-xs-1"><h3><i class="fa fa-table"></i></h3></div>

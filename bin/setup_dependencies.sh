@@ -58,6 +58,7 @@ packages=(
   'postgresql'
   'nginx'
   'htop'
+  'sipsak'
 )
 
 sudo apt-get update

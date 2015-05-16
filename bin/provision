@@ -15,6 +15,7 @@ PACKAGES=(
   'npm'
   'redis-tools'
   'redis-server'
+  'sipsak'
 )
 
 # OS-specific install instructions

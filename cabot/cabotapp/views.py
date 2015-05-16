@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from models import (
-    StatusCheck, GraphiteStatusCheck, JenkinsStatusCheck, HttpStatusCheck, ICMPStatusCheck,
+    StatusCheck, GraphiteStatusCheck, JenkinsStatusCheck, HttpStatusCheck, ICMPStatusCheck, SipStatusCheck,
     StatusCheckResult, UserProfile, Service, Instance, Shift, get_duty_officers)
 from tasks import run_status_check as _run_status_check
 from django.contrib.auth.decorators import login_required
@@ -63,6 +63,12 @@ def duplicate_icmp_check(request, pk):
     pc = StatusCheck.objects.get(pk=pk)
     npk = pc.duplicate()
     return HttpResponseRedirect(reverse('update-icmp-check', kwargs={'pk': npk}))
+
+def duplicate_sip_check(request, pk):
+    pc = StatusCheck.objects.get(pk=pk)
+    npk = pc.duplicate()
+    return HttpResponseRedirect(reverse('update-sip-check', kwargs={'pk': npk}))
+
 
 def duplicate_instance(request, pk):
     instance = Instance.objects.get(pk=pk)
@@ -184,6 +190,19 @@ class ICMPStatusCheckForm(StatusCheckForm):
 
     class Meta:
         model = ICMPStatusCheck
+        fields = (
+            'name',
+            'frequency',
+            'importance',
+            'active',
+            'debounce',
+        )
+        widgets = dict(**base_widgets)
+
+class SipStatusCheckForm(StatusCheckForm):
+
+    class Meta:
+        model = SipStatusCheck
         fields = (
             'name',
             'frequency',
@@ -425,7 +444,7 @@ class CheckCreateView(LoginRequiredMixin, CreateView):
             return reverse('service', kwargs={'pk': self.request.GET.get('service')})
         if self.request.GET.get('instance'):
             return reverse('instance', kwargs={'pk': self.request.GET.get('instance')})
-        return reverse('checks')  
+        return reverse('checks')
 
 
 class CheckUpdateView(LoginRequiredMixin, UpdateView):
@@ -442,6 +461,16 @@ class ICMPCheckCreateView(CheckCreateView):
 class ICMPCheckUpdateView(CheckUpdateView):
     model = ICMPStatusCheck
     form_class = ICMPStatusCheckForm
+
+class SipCheckCreateView(CheckCreateView):
+    model = SipStatusCheck
+    form_class = SipStatusCheckForm
+
+
+class SipCheckUpdateView(CheckUpdateView):
+    model = SipStatusCheck
+    form_class = SipStatusCheckForm
+
 
 class GraphiteCheckUpdateView(CheckUpdateView):
     model = GraphiteStatusCheck

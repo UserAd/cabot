@@ -2,10 +2,11 @@ from django.conf.urls import patterns, include, url
 from django.conf import settings
 from cabot.cabotapp.views import (
         run_status_check, graphite_api_data, checks_run_recently,
-        duplicate_icmp_check, duplicate_graphite_check, duplicate_http_check, duplicate_jenkins_check, duplicate_instance,
+        duplicate_icmp_check, duplicate_sip_check, duplicate_graphite_check, duplicate_http_check, duplicate_jenkins_check, duplicate_instance,
         GraphiteCheckCreateView, GraphiteCheckUpdateView,
         HttpCheckCreateView, HttpCheckUpdateView,
         ICMPCheckCreateView, ICMPCheckUpdateView,
+        SipCheckCreateView, SipCheckUpdateView,
         JenkinsCheckCreateView, JenkinsCheckUpdateView,
         StatusCheckDeleteView, StatusCheckListView, StatusCheckDetailView,
         StatusCheckResultDetailView, StatusCheckReportView, UserProfileUpdateAlert)
@@ -92,6 +93,15 @@ urlpatterns = patterns('',
                                                      ), name='update-icmp-check'),
                                              url(r'^icmpcheck/duplicate/(?P<pk>\d+)/',
                                                      view=duplicate_icmp_check, name='duplicate-icmp-check'),
+
+                                             url(r'^sipcheck/create/', view=SipCheckCreateView.as_view(),
+                                                     name='create-sip-check'),
+                                             url(r'^sipcheck/update/(?P<pk>\d+)/',
+                                                     view=SipCheckUpdateView.as_view(
+                                                     ), name='update-sip-check'),
+                                             url(r'^sipcheck/duplicate/(?P<pk>\d+)/',
+                                                     view=duplicate_sip_check, name='duplicate-sip-check'),
+
 
                                              url(r'^graphitecheck/create/',
                                                      view=GraphiteCheckCreateView.as_view(

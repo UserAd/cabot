@@ -197,6 +197,9 @@ class CheckGroupMixin(models.Model):
     def http_status_checks(self):
         return self.status_checks.filter(polymorphic_ctype__model='httpstatuscheck')
 
+    def sipp_status_checks(self):
+        return self.status_checks.filter(polymorphic_ctype__model='sipstatuscheck')
+
     def jenkins_status_checks(self):
         return self.status_checks.filter(polymorphic_ctype__model='jenkinsstatuscheck')
 
@@ -205,6 +208,10 @@ class CheckGroupMixin(models.Model):
 
     def active_http_status_checks(self):
         return self.http_status_checks().filter(active=True)
+
+    def active_sip_status_checks(self):
+        return self.sip_status_checks().filter(active=True)
+
 
     def active_jenkins_status_checks(self):
         return self.jenkins_status_checks().filter(active=True)
@@ -301,8 +308,14 @@ class Instance(CheckGroupMixin):
     def icmp_status_checks(self):
         return self.status_checks.filter(polymorphic_ctype__model='icmpstatuscheck')
 
+    def sip_status_checks(self):
+        return self.status_checks.filter(polymorphic_ctype__model='sipstatuscheck')
+
     def active_icmp_status_checks(self):
         return self.icmp_status_checks().filter(active=True)
+
+    def active_sip_status_checks(self):
+        return self.sip_status_checks().filter(active=True)
 
     def delete(self, *args, **kwargs):
         self.icmp_status_checks().delete()
@@ -537,6 +550,33 @@ class ICMPStatusCheck(StatusCheck):
 
         # We need to read both STDOUT and STDERR because ping can write to both, depending on the kind of error. Thanks a lot, ping.
         ping_process = subprocess.Popen("ping -c 1 " + target, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        response = ping_process.wait()
+
+        if response == 0:
+            result.succeeded = True
+        else:
+            output = ping_process.stdout.read()
+            result.succeeded = False
+            result.error = output
+
+        return result
+
+class SipStatusCheck(StatusCheck):
+
+    class Meta(StatusCheck.Meta):
+        proxy = True
+
+    @property
+    def check_category(self):
+        return "SIP Options Check"
+
+    def _run(self):
+        result = StatusCheckResult(check=self)
+        instances = self.instance_set.all()
+        target = self.instance_set.get().address
+
+        # We need to read both STDOUT and STDERR because ping can write to both, depending on the kind of error. Thanks a lot, ping.
+        ping_process = subprocess.Popen("sipsak -s sip:" + target, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         response = ping_process.wait()
 
         if response == 0:
