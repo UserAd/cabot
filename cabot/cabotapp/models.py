@@ -197,7 +197,7 @@ class CheckGroupMixin(models.Model):
     def http_status_checks(self):
         return self.status_checks.filter(polymorphic_ctype__model='httpstatuscheck')
 
-    def sipp_status_checks(self):
+    def sip_status_checks(self):
         return self.status_checks.filter(polymorphic_ctype__model='sipstatuscheck')
 
     def jenkins_status_checks(self):

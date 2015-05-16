@@ -16,6 +16,8 @@ PACKAGES=(
   'redis-tools'
   'redis-server'
   'sipsak'
+  'libsasl2-dev'
+  'libldap2-dev'
 )
 
 # OS-specific install instructions

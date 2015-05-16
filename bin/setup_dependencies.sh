@@ -59,6 +59,8 @@ packages=(
   'nginx'
   'htop'
   'sipsak'
+  'libsasl2-dev'
+  'libldap2-dev'
 )
 
 sudo apt-get update
